@@ -1,4 +1,4 @@
-# 牛客网 SQ L实战 | Day2
+# 牛客网 SQL实战 | Day2
 
 [题目来源](https://www.nowcoder.com/ta/sql)
 
@@ -245,10 +245,27 @@ PRIMARY KEY (`emp_no`,`dept_no`));
 #### 代码
 
 ```mysql
-SELECT de.dept_no, de.emp_no, MAX(salary)
-FROM dept_emp AS de INNER JOIN salaries AS s
-ON de.emp_no = s.emp_no
-WHERE de.to_date = '9999-01-01' AND s.to_date = '9999-01-01'
-GROUP BY de.dept_no
+链接：https://www.nowcoder.com/questionTerminal/4a052e3e1df5435880d4353eb18a91c6?f=discussion
+来源：牛客网
+
+SELECT currentsalary.dept_no, currentsalary.emp_no, currentsalary.salary AS salary
+FROM 
+//创建maxsalary表用于存放当前每个部门薪水的最大值
+(SELECT d.dept_no, MAX(s.salary) AS salary
+FROM salaries AS s INNER JOIN dept_emp As d
+ON d.emp_no = s.emp_no 
+WHERE d.to_date = '9999-01-01' AND s.to_date = '9999-01-01'
+GROUP BY d.dept_no) AS maxsalary, 
+//创建currentsalary表用于存放当前每个部门所有员工的编号和薪水
+(SELECT d.dept_no, s.emp_no, s.salary 
+FROM salaries AS s INNER JOIN dept_emp As d
+ON d.emp_no = s.emp_no 
+WHERE d.to_date = '9999-01-01' AND s.to_date = '9999-01-01'
+) AS currentsalary
+//限定条件为两表的dept_no和salary均相等
+WHERE currentsalary.dept_no = maxsalary.dept_no
+AND currentsalary.salary = maxsalary.salary
+//最后以currentsalary.dept_no排序输出符合要求的记录表
+ORDER BY currentsalary.dept_no
 ```
 
